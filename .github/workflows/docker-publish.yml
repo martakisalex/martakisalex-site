@@ -1,7 +1,7 @@
 name: Build and Push Docker Image
 
 on:
-  pull_request:
+  push:
     branches:
       - develop
       - main
@@ -42,8 +42,8 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            ${{ env.VERSION }}
-            latest
+            ${{ env.VERSION }}${{ github.ref_name == 'develop' && '-develop' || '' }}
+            latest  # optional for main branch
 
       - name: Build and push Docker image
         id: push
@@ -52,19 +52,16 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:${{ env.VERSION }}
-            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ env.VERSION }}${{ github.ref_name == 'develop' && '-develop' || '' }}
+            ghcr.io/${{ github.repository }}:latest  # for main branch only
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Debug - Check Digest Output
-        run: "echo Digest: ${{ steps.push.outputs.digest }}"
-
-
       - name: Generate artifact attestation
+        if: github.ref_name == 'main'
         uses: actions/attest-build-provenance@v1
         with:
-          subject-name: "ghcr.io/${{ github.repository }}:1.1.11" # Manually specify the exact version here for testing
+          subject-name: "ghcr.io/${{ github.repository }}:${{ env.VERSION }}"
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
