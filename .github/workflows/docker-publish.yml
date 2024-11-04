@@ -42,7 +42,7 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            ${{ env.VERSION }}-develop
+            ${{ env.VERSION }}
             latest
 
       - name: Build and push Docker image
@@ -61,6 +61,6 @@ jobs:
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-name: ghcr.io/${{ github.repository }}:${{ env.VERSION }}
+          subject-name: "ghcr.io/${{ github.repository }}:${{ env.VERSION }}"
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
