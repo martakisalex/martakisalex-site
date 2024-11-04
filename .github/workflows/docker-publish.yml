@@ -58,9 +58,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Debug - Check Digest Output
+        run: "echo Digest: ${{ steps.push.outputs.digest }}"
+
+
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-name: "ghcr.io/${{ github.repository }}:${{ env.VERSION }}"
+          subject-name: "ghcr.io/${{ github.repository }}:1.1.11" # Manually specify the exact version here for testing
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
