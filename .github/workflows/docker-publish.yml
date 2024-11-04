@@ -46,7 +46,7 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             ${{ env.version }}${{ github.ref_name == 'develop' && '-develop' || '' }}
-            latest  # optional: for the latest version on main
+            latest  # optional for main branch releases only
 
       - name: Build and push Docker image
         id: push
@@ -56,7 +56,7 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository }}:${{ env.version }}${{ github.ref_name == 'develop' && '-develop' || '' }}
-            ghcr.io/${{ github.repository }}:latest  # optional: latest tag for main branch
+            ghcr.io/${{ github.repository }}:latest  # optional latest tag for main branch only
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
