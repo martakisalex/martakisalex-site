@@ -28,13 +28,16 @@ jobs:
         id: version
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          echo "version=${VERSION}" >> $GITHUB_ENV
+          if [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+            VERSION="${VERSION}-develop"
+          fi
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
       - name: Check for existing tag
         id: tag_check
         run: |
-          if git rev-parse "v${{ env.version }}" >/dev/null 2>&1; then
-            echo "Tag v${{ env.version }} already exists. Skipping tagging."
+          if git rev-parse "v${{ env.VERSION }}" >/dev/null 2>&1; then
+            echo "Tag v${{ env.VERSION }} already exists. Skipping tagging."
             exit 0
           fi
 
@@ -45,5 +48,5 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "v${{ env.version }}"
-          git push origin "v${{ env.version }}"
+          git tag "v${{ env.VERSION }}"
+          git push origin "v${{ env.VERSION }}"
